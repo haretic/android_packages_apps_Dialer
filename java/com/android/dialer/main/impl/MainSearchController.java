@@ -24,6 +24,7 @@ import android.speech.RecognizerIntent;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.widget.Toast;
@@ -251,10 +252,14 @@ public class MainSearchController implements SearchBarListener {
 
   private void hideBottomNav() {
     bottomNav.setVisibility(View.GONE);
+    // The search UI covers the lists while the bottom nav is gone, as the dialpad over an empty
+    // speed dial: nothing in them takes the focus, nor a D-pad or wheel step lands out of sight
+    ((ViewGroup) fragmentContainer).setDescendantFocusability(ViewGroup.FOCUS_BLOCK_DESCENDANTS);
   }
 
   private void showBottomNav() {
     bottomNav.setVisibility(View.VISIBLE);
+    ((ViewGroup) fragmentContainer).setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
   }
 
   /** Should be called when {@link DialpadListener#onDialpadShown()} is called. */
