@@ -76,6 +76,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import com.android.contacts.common.dialog.CallSubjectDialog;
 import com.android.dialer.R;
@@ -163,6 +164,7 @@ public class DialpadFragment extends Fragment
 
   private OnDialpadQueryChangedListener dialpadQueryListener;
   private DialpadView dialpadView;
+  private RotaryDialView rotaryDial;
   private EditText digits;
   private TextView digitsHint;
   private int dialpadSlideInDuration;
@@ -417,6 +419,25 @@ public class DialpadFragment extends Fragment
       configureKeypadListeners(fragmentView);
     }
 
+    rotaryDial = fragmentView.findViewById(R.id.rotary_dial);
+    rotaryDial.setListener(new RotaryDialView.Listener() {
+      @Override
+      public void onDigit(int digit) {
+        keyPressed(KeyEvent.KEYCODE_0 + digit, false);
+      }
+
+      @Override
+      public void onBackspace() {
+        keyPressed(KeyEvent.KEYCODE_DEL);
+      }
+
+      @Override
+      public void onCallFocus() {
+        floatingActionButton.requestFocus();
+      }
+    });
+    updateRotaryDial();
+
     delete = dialpadView.getDeleteButton();
 
     if (delete != null) {
@@ -452,6 +473,27 @@ public class DialpadFragment extends Fragment
     Trace.endSection();
     Trace.endSection();
     return fragmentView;
+  }
+
+  private void updateRotaryDial() {
+    boolean enabled = PreferenceManager.getDefaultSharedPreferences(requireContext())
+        .getBoolean("rotary_dial", false);
+    boolean wasEnabled = rotaryDial.getVisibility() == View.VISIBLE;
+    dialpadView.findViewById(R.id.dialpad).setVisibility(enabled ? View.GONE : View.VISIBLE);
+    rotaryDial.setVisibility(enabled ? View.VISIBLE : View.GONE);
+    dialpadView.findViewById(R.id.rotary_call_space)
+        .setVisibility(enabled ? View.VISIBLE : View.GONE);
+    if (enabled != wasEnabled) {
+      if (enabled) {
+        rotaryDial.requestFocus();
+      } else {
+        digits.requestFocus();
+      }
+    }
+    if (floatingActionButton != null) {
+      floatingActionButton.setNextFocusUpId(enabled ? R.id.rotary_dial : View.NO_ID);
+      floatingActionButton.setNextFocusDownId(enabled ? R.id.rotary_dial : View.NO_ID);
+    }
   }
 
   /**
@@ -746,6 +788,7 @@ public class DialpadFragment extends Fragment
     LogUtil.enterBlock("DialpadFragment.onResume");
     Trace.beginSection(TAG + " onResume");
     super.onResume();
+    updateRotaryDial();
 
     dialpadQueryListener = FragmentUtils.getParentUnsafe(this, OnDialpadQueryChangedListener.class);
 
@@ -795,6 +838,7 @@ public class DialpadFragment extends Fragment
   @Override
   public void onPause() {
     super.onPause();
+    rotaryDial.reset();
 
     // Make sure we don't leave this activity with a tone still playing.
     stopTone();
@@ -845,48 +889,54 @@ public class DialpadFragment extends Fragment
   }
 
   private void keyPressed(int keyCode) {
+    keyPressed(keyCode, true);
+  }
+
+  private void keyPressed(int keyCode, boolean playDtmf) {
     if (getView() == null || getView().getTranslationY() != 0) {
       return;
     }
-    switch (keyCode) {
-      case KeyEvent.KEYCODE_1:
-        playTone(ToneGenerator.TONE_DTMF_1, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_2:
-        playTone(ToneGenerator.TONE_DTMF_2, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_3:
-        playTone(ToneGenerator.TONE_DTMF_3, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_4:
-        playTone(ToneGenerator.TONE_DTMF_4, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_5:
-        playTone(ToneGenerator.TONE_DTMF_5, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_6:
-        playTone(ToneGenerator.TONE_DTMF_6, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_7:
-        playTone(ToneGenerator.TONE_DTMF_7, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_8:
-        playTone(ToneGenerator.TONE_DTMF_8, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_9:
-        playTone(ToneGenerator.TONE_DTMF_9, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_0:
-        playTone(ToneGenerator.TONE_DTMF_0, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_POUND:
-        playTone(ToneGenerator.TONE_DTMF_P, TONE_LENGTH_INFINITE);
-        break;
-      case KeyEvent.KEYCODE_STAR:
-        playTone(ToneGenerator.TONE_DTMF_S, TONE_LENGTH_INFINITE);
-        break;
-      default:
-        break;
+    if (playDtmf) {
+      switch (keyCode) {
+        case KeyEvent.KEYCODE_1:
+          playTone(ToneGenerator.TONE_DTMF_1, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_2:
+          playTone(ToneGenerator.TONE_DTMF_2, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_3:
+          playTone(ToneGenerator.TONE_DTMF_3, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_4:
+          playTone(ToneGenerator.TONE_DTMF_4, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_5:
+          playTone(ToneGenerator.TONE_DTMF_5, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_6:
+          playTone(ToneGenerator.TONE_DTMF_6, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_7:
+          playTone(ToneGenerator.TONE_DTMF_7, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_8:
+          playTone(ToneGenerator.TONE_DTMF_8, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_9:
+          playTone(ToneGenerator.TONE_DTMF_9, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_0:
+          playTone(ToneGenerator.TONE_DTMF_0, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_POUND:
+          playTone(ToneGenerator.TONE_DTMF_P, TONE_LENGTH_INFINITE);
+          break;
+        case KeyEvent.KEYCODE_STAR:
+          playTone(ToneGenerator.TONE_DTMF_S, TONE_LENGTH_INFINITE);
+          break;
+        default:
+          break;
+      }
     }
 
     getView().performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY);
@@ -1545,12 +1595,19 @@ public class DialpadFragment extends Fragment
     if (getActivity() == null || getView() == null) {
       return;
     }
+    if (hidden) {
+      rotaryDial.reset();
+    }
     if (!hidden && !isDialpadChooserVisible()) {
       if (animate) {
         dialpadView.animateShow();
       }
       FragmentUtils.getParentUnsafe(this, DialpadListener.class).onDialpadShown();
-      digits.requestFocus();
+      if (rotaryDial.getVisibility() == View.VISIBLE) {
+        rotaryDial.requestFocus();
+      } else {
+        digits.requestFocus();
+      }
     }
   }
 

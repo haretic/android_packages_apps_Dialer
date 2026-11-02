@@ -576,6 +576,10 @@ public class DialpadView extends LinearLayout {
 
       DialpadKeyButton dialpadKey = (DialpadKeyButton) findViewById(BUTTON_IDS[0]);
       LinearLayout keyLayout = (LinearLayout) dialpadKey.findViewById(R.id.dialpad_key_layout);
+      // Inline digits and letters already share a centre line.
+      if (keyLayout.getOrientation() == LinearLayout.HORIZONTAL) {
+        return false;
+      }
       final int height = keyLayout.getHeight();
 
       // BUTTON_IDS[i] is the resource ID for button i when 0 <= i && i <= 9.

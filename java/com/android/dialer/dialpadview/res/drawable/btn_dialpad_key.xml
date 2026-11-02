@@ -15,4 +15,17 @@
 -->
 
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-  android:color="?android:attr/colorControlHighlight"/>
+    android:color="?android:attr/colorControlHighlight">
+  <item>
+    <selector>
+      <item android:state_focused="true">
+        <shape>
+          <corners android:radius="12dp"/>
+          <stroke android:width="2dp" android:color="@color/dialer_theme_color_light"/>
+          <solid android:color="?android:attr/colorControlHighlight"/>
+        </shape>
+      </item>
+      <item android:drawable="@android:color/transparent"/>
+    </selector>
+  </item>
+</ripple>

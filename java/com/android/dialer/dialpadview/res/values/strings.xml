@@ -89,4 +89,13 @@
   <!-- Warning hint shown in the dialpad input field when emergency call (911, etc.) cannot be made over wifi.
        [CHAR_LIMIT=60] -->
   <string name="dialpad_hint_emergency_calling_not_available">Can\'t make emergency calls over WiFi</string>
+  <string name="rotary_dial_title">Rotary dial</string>
+  <string name="rotary_dial_summary">Dial numbers like an old telephone: turn the wheel to wind, press to let go</string>
+  <string name="rotary_dial_description">Rotary dial. Scroll down to wind, up to unwind or erase at rest. Press to release. Press at rest to focus Call. Swipe forward or backward with TalkBack to wind or unwind.</string>
+  <string name="rotary_dial_wound">Wound to %1$s</string>
+  <string name="rotary_dial_rest">At rest</string>
+  <string name="rotary_dial_wind">Turn to wind</string>
+  <string name="rotary_dial_release">Press to let go</string>
+  <string name="rotary_dial_call">At rest: press for Call</string>
+  <string name="rotary_dial_returning">Returning</string>
 </resources>

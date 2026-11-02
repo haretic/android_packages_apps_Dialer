@@ -164,7 +164,23 @@
       android:layout_width="match_parent"
       android:layout_height="@dimen/dialpad_space_above_keys"/>
 
-  <include layout="@layout/dialpad"/>
+  <include
+      layout="@layout/dialpad"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/dialpad_grid_height"/>
+
+  <com.android.dialer.dialpadview.RotaryDialView
+      android:id="@+id/rotary_dial"
+      android:layout_width="match_parent"
+      android:layout_height="@dimen/rotary_dial_size"
+      android:layout_marginHorizontal="12dp"
+      android:visibility="gone"/>
+
+  <Space
+      android:id="@+id/rotary_call_space"
+      android:layout_width="match_parent"
+      android:layout_height="?attr/dialpad_end_key_spacing"
+      android:visibility="gone"/>
 
   <Space
       android:layout_width="match_parent"

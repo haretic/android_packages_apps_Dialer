@@ -42,9 +42,12 @@ import java.util.List;
 /** RecyclerView adapter for {@link NewSearchFragment}. */
 public final class SearchAdapter extends RecyclerView.Adapter<ViewHolder> {
 
+  private static final int COMPACT_ROW = 1 << 8;
+
   private final SearchCursorManager searchCursorManager;
   private final Context context;
 
+  private boolean dialpadVisible;
   private String query;
   // Raw query number from dialpad, which may contain special character such as "+". This is used
   // for actions to add contact or send sms.
@@ -61,24 +64,28 @@ public final class SearchAdapter extends RecyclerView.Adapter<ViewHolder> {
   }
 
   @Override
-  public ViewHolder onCreateViewHolder(ViewGroup root, @RowType int rowType) {
-    switch (rowType) {
+  public ViewHolder onCreateViewHolder(ViewGroup root, int rowType) {
+    int contactLayout = (rowType & COMPACT_ROW) != 0
+        ? R.layout.search_contact_row_compact : R.layout.search_contact_row;
+    int headerLayout = (rowType & COMPACT_ROW) != 0
+        ? R.layout.header_layout_compact : R.layout.header_layout;
+    switch (rowType & ~COMPACT_ROW) {
       case RowType.CONTACT_ROW:
         return new SearchContactViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.search_contact_row, root, false),
+            LayoutInflater.from(context).inflate(contactLayout, root, false),
             rowClickListener);
       case RowType.NEARBY_PLACES_ROW:
         return new NearbyPlaceViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.search_contact_row, root, false),
+            LayoutInflater.from(context).inflate(contactLayout, root, false),
             rowClickListener);
       case RowType.CONTACT_HEADER:
       case RowType.DIRECTORY_HEADER:
       case RowType.NEARBY_PLACES_HEADER:
         return new HeaderViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.header_layout, root, false));
+            LayoutInflater.from(context).inflate(headerLayout, root, false));
       case RowType.DIRECTORY_ROW:
         return new DirectoryContactViewHolder(
-            LayoutInflater.from(context).inflate(R.layout.search_contact_row, root, false),
+            LayoutInflater.from(context).inflate(contactLayout, root, false),
             rowClickListener);
       case RowType.SEARCH_ACTION:
         return new SearchActionViewHolder(
@@ -96,8 +103,15 @@ public final class SearchAdapter extends RecyclerView.Adapter<ViewHolder> {
   }
 
   @Override
-  public @RowType int getItemViewType(int position) {
-    return searchCursorManager.getRowType(position);
+  public int getItemViewType(int position) {
+    int rowType = searchCursorManager.getRowType(position);
+    if (dialpadVisible && (rowType == RowType.CONTACT_ROW
+        || rowType == RowType.DIRECTORY_ROW || rowType == RowType.NEARBY_PLACES_ROW
+        || rowType == RowType.CONTACT_HEADER || rowType == RowType.DIRECTORY_HEADER
+        || rowType == RowType.NEARBY_PLACES_HEADER)) {
+      return rowType | COMPACT_ROW;
+    }
+    return rowType;
   }
 
   @Override
@@ -122,6 +136,13 @@ public final class SearchAdapter extends RecyclerView.Adapter<ViewHolder> {
       // No-op
     } else {
       throw Assert.createIllegalStateFailException("Invalid ViewHolder: " + holder);
+    }
+  }
+
+  void setDialpadVisible(boolean visible) {
+    if (dialpadVisible != visible) {
+      dialpadVisible = visible;
+      notifyDataSetChanged();
     }
   }
 

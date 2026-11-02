@@ -39,4 +39,11 @@
       android:defaultValue="@string/display_options_view_given_name_first_value"
       app:iconSpaceReserved="false"/>
 
+  <SwitchPreferenceCompat
+      android:key="rotary_dial"
+      android:title="@string/rotary_dial_title"
+      android:summary="@string/rotary_dial_summary"
+      android:defaultValue="false"
+      app:iconSpaceReserved="false"/>
+
 </PreferenceScreen>

@@ -21,11 +21,14 @@
 
   <LinearLayout
       android:id="@+id/dialpad_key_layout"
-      style="@style/DialpadKeyInternalLayoutStyle">
+      style="@style/DialpadKeyInternalLayoutStyle"
+      android:orientation="horizontal"
+      android:baselineAligned="false">
 
     <com.android.dialer.dialpadview.DialpadTextView
         android:id="@+id/dialpad_key_number"
-        style="@style/DialpadKeyNumberStyle"/>
+        style="@style/DialpadKeyNumberStyle"
+        android:layout_marginEnd="6dp"/>
 
     <LinearLayout
         android:id="@+id/dialpad_key_icon_or_letters_layout"

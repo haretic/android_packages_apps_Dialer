@@ -225,6 +225,7 @@ public class MainSearchController implements SearchBarListener {
     fab.show();
     toolbar.slideDown(animate, fragmentContainer);
     toolbar.transferQueryFromDialpad(dialpadFragment.getQuery());
+    searchFragment.setDialpadVisible(false);
     activity.setTitle(R.string.main_activity_label);
 
     dialpadFragment.setAnimate(animate);
@@ -266,6 +267,7 @@ public class MainSearchController implements SearchBarListener {
   public void onDialpadShown() {
     LogUtil.enterBlock("MainSearchController.onDialpadShown");
     dialpadFragment.slideUp(true);
+    searchFragment.setDialpadVisible(true);
     hideBottomNav();
   }
 

@@ -93,12 +93,14 @@ public final class NewSearchFragment extends Fragment
 
   private static final int DIRECTORY_CONTACTS_LOADER_ID = 3;
 
+  private static final String KEY_DIALPAD_VISIBLE = "dialpad_visible";
   private static final String KEY_QUERY = "key_query";
   private static final String KEY_CALL_INITIATION_TYPE = "key_call_initiation_type";
 
   private EmptyContentView emptyContentView;
   private RecyclerView recyclerView;
   private SearchAdapter adapter;
+  private boolean dialpadVisible;
   private String query;
   // Raw query number from dialpad, which may contain special character such as "+". This is used
   // for actions to add contact or send sms.
@@ -159,7 +161,11 @@ public final class NewSearchFragment extends Fragment
   public View onCreateView(
       LayoutInflater inflater, @Nullable ViewGroup parent, @Nullable Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_search, parent, false);
+    if (savedInstanceState != null) {
+      dialpadVisible = savedInstanceState.getBoolean(KEY_DIALPAD_VISIBLE);
+    }
     adapter = new SearchAdapter(getContext(), new SearchCursorManager(), this);
+    adapter.setDialpadVisible(dialpadVisible);
     adapter.setQuery(query, rawNumber);
     adapter.setSearchActions(getActions());
     showLocationPermission();
@@ -194,6 +200,7 @@ public final class NewSearchFragment extends Fragment
   @Override
   public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
+    outState.putBoolean(KEY_DIALPAD_VISIBLE, dialpadVisible);
     outState.putInt(KEY_CALL_INITIATION_TYPE, callInitiationType.getNumber());
     outState.putString(KEY_QUERY, query);
   }
@@ -264,6 +271,13 @@ public final class NewSearchFragment extends Fragment
       adapter.setNearbyPlacesCursor(null);
     } else if (loader instanceof DirectoryContactsCursorLoader) {
       adapter.setDirectoryContactsCursor(null);
+    }
+  }
+
+  public void setDialpadVisible(boolean visible) {
+    dialpadVisible = visible;
+    if (adapter != null) {
+      adapter.setDialpadVisible(visible);
     }
   }
 
