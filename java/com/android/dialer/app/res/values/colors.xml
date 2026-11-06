@@ -40,4 +40,6 @@
 
   <!-- Material next track off color-->
   <color name="track_off_color">@android:color/system_neutral2_500</color>
+  <!-- haretic: the text on the accent filled button, dark on the dark theme's light accent -->
+  <color name="dialer_primary_button_text_color">@android:color/white</color>
 </resources>
